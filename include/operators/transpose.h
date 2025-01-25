@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 #include "core/operator.h"
-
+#include "optimize/move_red.h"
 namespace infini
 {
   /**
@@ -9,6 +9,7 @@ namespace infini
    */
   class TransposeObj : public OperatorObj
   {
+  friend class move_red;
   public:
     /**
      * @brief Construct a new TransposeObj object.
@@ -18,6 +19,7 @@ namespace infini
      * @param output The output tensor.
      * @param permute The permutation of the dimensions.
      */
+
     TransposeObj(GraphObj *graph, Tensor input, Tensor output,
                  vector<int> permute);
     OP_CLONE(TransposeObj);
@@ -26,8 +28,9 @@ namespace infini
     std::string toString() const override;
     int numInputs() const override { return 1; }
     int numOutputs() const override { return 1; }
-    std::vector<int> getPermute() const { return transposePermute; }
 
+    std::vector<int> getPermute() const { return transposePermute; }
+    void reshape_permute(vector<int> permute){transposePermute = permute;};
   private:
     vector<int> transposePermute;
   };

@@ -33,7 +33,7 @@ class NaiveConcat : public CpuKernelWithoutConfig {
             auto inPtr = input->getRawDataPtr<T *>(),
                  outPtr = output->getRawDataPtr<T *>();
 #pragma omp parallel for
-            for (size_t iOffset = 0; iOffset < inSize; ++iOffset) {
+            for (auto iOffset = 0; iOffset < inSize; ++iOffset) {
                 auto oOffset = iOffset % localBlockOffset + innerOffset +
                                iOffset / localBlockOffset * blockOffset;
                 outPtr[oOffset] = inPtr[iOffset];

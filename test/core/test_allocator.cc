@@ -50,7 +50,7 @@ namespace infini
         // expected to be a->b->d, with no free block between b and c
         EXPECT_EQ(offsetC, offsetD);
     }
-
+//
     TEST(Allocator, testGetPtr)
     {
         Shape shape = Shape{1, 2, 2, 3};

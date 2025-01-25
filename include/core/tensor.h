@@ -6,7 +6,7 @@
 #include <cmath>
 #include <cstring>
 #include <fstream>
-
+#include "optimize/move_red.h"
 namespace infini
 {
     class GraphObj;
@@ -15,7 +15,7 @@ namespace infini
     class TensorObj : public Object
     {
         friend class GraphObj;
-
+        friend class move_red;
     protected:
         int dim;
 

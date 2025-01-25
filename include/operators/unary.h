@@ -4,7 +4,7 @@
 namespace infini
 {
   /**
-   * @brief The base class for unary operators.
+   * @brief The optim_base class for unary operators.
    *
    */
   class UnaryObj : public OperatorObj

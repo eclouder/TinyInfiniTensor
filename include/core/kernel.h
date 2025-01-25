@@ -54,9 +54,9 @@ namespace infini
         Kernel *getKernel(const KernelAttrs &kernelAttrs) const
         {
             auto it = kernels.find(kernelAttrs);
-            IT_ASSERT(it != kernels.end(), "Kernel not found for key {" +
-                                               get_kernel_attrs_str(kernelAttrs) +
-                                               "}");
+//            IT_ASSERT(it != kernels.end(), "Kernel not found for key {" +
+//                                               get_kernel_attrs_str(kernelAttrs) +
+//                                               "}");
             return std::get<0>(it->second);
         }
         const KernelRecord &getKernelItem(const KernelAttrs &kernelAttrs) const

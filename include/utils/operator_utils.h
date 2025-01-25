@@ -20,7 +20,7 @@ size_t delocate_index(const Shape &shapeIndex, const Shape &shape,
                       const Shape &stride);
 // Convert KernelAttrs to a string representation
 std::string get_kernel_attrs_str(const KernelAttrs &kernelAttrs);
-
+Shape reorderVector(const Shape &vec,const Shape &permute);
 } // namespace infini
 
 #endif

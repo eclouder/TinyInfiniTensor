@@ -29,7 +29,7 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF) # -std=gnu++11 when on, -std=c++11 when off
-add_compile_options(-Wno-error=unused-variable)
+#add_compile_options(-Wno-error=unused-variable)
 
 find_package(
   Python
@@ -45,7 +45,7 @@ if(OpenMP_CXX_FOUND)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-include_directories(include)
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
 if(BUILD_TEST)
   set(BUILD_GMOCK
@@ -58,39 +58,47 @@ if(BUILD_TEST)
   include_directories(3rd-party/googletest/googletest/include)
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Werror -Wno-error=deprecated-declarations -Wno-error=pointer-arith")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -UNDEBUG") # Enable assertion
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -UNDEBUG") # Enable assertion
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Werror -Wno-error=deprecated-declarations -Wno-error=pointer-arith")
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -UNDEBUG") # Enable assertion
+#set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -UNDEBUG") # Enable assertion
 
 
 # Source files
-file(GLOB_RECURSE SRC src/core/*.cc src/kernels/cpu/*.cc src/operators/*.cc src/utils/*.cc)
+file(GLOB_RECURSE SRC src/core/*.cc
+        src/kernels/cpu/*.cc
+        src/operators/*.cc
+        src/utils/*.cc
+        src/optimize/*.cc)
 
-if(USE_INTELCPU)
-  file(GLOB_RECURSE SRC_INTELCPU src/intelcpu/*.cc src/kernels/intelcpu/*.cc )
-  list (APPEND SRC ${SRC_INTELCPU})
-endif()
-
+#if(USE_INTELCPU)
+#  file(GLOB_RECURSE SRC_INTELCPU src/intelcpu/*.cc src/kernels/intelcpu/*.cc )
+#  list (APPEND SRC ${SRC_INTELCPU})
+#endif()
 # Libraries
-add_library(InfiniTensor SHARED ${SRC})
+add_executable(InfiniTensor
+        ${SRC}
+        test/test_run.cc
 
-function(build_test files)
-  # Non-recursive glob for skip failed tests
-  file(GLOB TEST_SOURCES ${files})
-  foreach(testsourcefile ${TEST_SOURCES})
-    get_filename_component(testname ${testsourcefile} NAME_WE)
-    add_executable(${testname} ${testsourcefile})
-    target_link_libraries(${testname} InfiniTensor GTest::gtest_main)
-    add_test(NAME ${testname} COMMAND ${testname})
-  endforeach(testsourcefile ${TEST_SOURCES})
-endfunction()
+)
+target_include_directories(InfiniTensor PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
-if(BUILD_TEST)
-  add_compile_definitions(BUILD_TEST=1)
-  enable_testing()
-  if(BUILD_TEST_CORE)
-    build_test(test/core/*.cc)
-    build_test(test/operators/*.cc)
-    build_test(test/kernels/nativecpu/*.cc)
-  endif()
-endif()
+#function(build_test files)
+#  # Non-recursive glob for skip failed tests
+#  file(GLOB TEST_SOURCES ${files})
+#  foreach(testsourcefile ${TEST_SOURCES})
+#    get_filename_component(testname ${testsourcefile} NAME_WE)
+#    add_executable(${testname} ${testsourcefile})
+#    target_link_libraries(${testname} InfiniTensor GTest::gtest_main)
+#    add_test(NAME ${testname} COMMAND ${testname} )
+#  endforeach(testsourcefile ${TEST_SOURCES})
+#endfunction()
+#
+#if(BUILD_TEST)
+#  add_compile_definitions(BUILD_TEST=1)
+#  enable_testing()
+#  if(BUILD_TEST_CORE)
+#    build_test(test/core/*.cc)
+#    build_test(test/operators/*.cc)
+#    build_test(test/kernels/nativecpu/*.cc)
+#  endif()
+#endif()

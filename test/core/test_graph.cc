@@ -27,6 +27,7 @@ namespace infini
         g->optimize();
         // 优化后
         g->print();
+        std::cout << g->getOperators().size() << std::endl;
         EXPECT_EQ(g->getOperators().size(), 1);
         EXPECT_EQ(g->getTensors().size(), 3);
         EXPECT_EQ(g->getOperators()[0]->getOpType().underlying(), 7);

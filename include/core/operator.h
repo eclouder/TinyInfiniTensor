@@ -2,7 +2,7 @@
 
 #include "core/op_type.h"
 #include "core/tensor.h"
-
+#include "optimize/move_red.h"
 namespace infini
 {
     using KernelAttrs = std::tuple<Device, OpType::underlying_t>;
@@ -11,7 +11,7 @@ namespace infini
     class OperatorObj : public Object
     {
         friend class GraphObj;
-
+        friend class move_red;
     protected:
         OpType type;
         TensorVec inputs;
@@ -35,6 +35,7 @@ namespace infini
     public: // getter and setter
         const TensorVec &getInputs() const { return inputs; }
         const TensorVec &getOutputs() const { return outputs; }
+        const Tensor &getOutputs(int i) const { return outputs[i]; }
         Tensor getInputs(size_t i) const { return inputs.at(i); }
         Tensor getOutput() const
         {

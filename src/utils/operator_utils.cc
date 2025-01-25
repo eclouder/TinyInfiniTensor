@@ -9,8 +9,20 @@ Shape infer_broadcast(const Shape &A, const Shape &B) {
     // TODO：对 A 和 B 进行双向广播，返回广播后的形状。
     // REF: https://github.com/onnx/onnx/blob/main/docs/Broadcasting.md
     // =================================== 作业 ===================================
-    
-    return {};
+    int rankA = A.size();
+    int rankB = B.size();
+    int rank = std::max(rankA,rankB);
+    Shape shape(rank,0);
+    // 从后往前
+    for(int i = 0;i<rank;++i){
+        auto d_a = rankA<i ? A[rankA-i-1]:1;
+        auto d_b = rankB<i ? B[rankB-i-1]:1;
+        if (d_a == d_b || d_b == 1 || d_a == 1){
+            shape[rank-i - 1]  = std::max(d_a,d_b);
+        }
+    }
+
+    return shape;
 }
 
 int get_real_axis(const int &axis, const int &rank) {
@@ -65,5 +77,12 @@ std::string get_kernel_attrs_str(const KernelAttrs &kernelAttrs) {
     std::string opStr = OpType(std::get<1>(kernelAttrs)).toString();
     return deviceStr + ", " + opStr;
 }
+Shape reorderVector(const Shape& vec,const Shape &permute){
+    std::vector<int> reordered(vec.size());
 
+    for (size_t i = 0; i < vec.size(); ++i) {
+        reordered[i] = vec[permute[i]];
+    }
+    return  reordered;
+}
 } // namespace infini
