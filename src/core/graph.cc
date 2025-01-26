@@ -126,7 +126,7 @@ namespace infini
                     prev_op->removeSuccessors(op);
                     Shape optimed_permute = reorderVector(prev_permute,cur_permute);
                     if (optimed_permute != Shape {0,1,2,3}){
-                    op->reshape_permute(reorderVector(prev_permute,cur_permute));
+                    prev_op->reshape_permute(reorderVector(prev_permute,cur_permute));
                     for(auto next_op:op->getSuccessors()){
                         next_op->replaceInput(op->getOutputs(0),prev_input);
                         prev_input->addTarget(next_op);
@@ -135,10 +135,12 @@ namespace infini
                     }
 //                auto new_op = op->getSuccessors()[0];
                     removeTensor(op->getOutput());
-                    removeOperator(op);} else{
+                    removeOperator(op);
+                    } else{
                         for(auto next_op:op->getSuccessors()){
                             next_op->replaceInput(op->getOutputs(0),prev_input);
                             next_op->removePredecessors(op);
+                            prev_input->addTarget(next_op);
                         }
                         removeTensor(op->getOutput());
                         removeOperator(op);
@@ -172,17 +174,22 @@ namespace infini
                             return is_same && permute[rank - 1] == rank - 2 && permute[rank - 2] == rank - 1;
                         }();
                         if (enable_optim){
+                            Tensor pre_input;
                             if (prev_op_output->getFuid() ==
                                 _op->getInputs(0)->getFuid()) {
                                 op->setTransA(true);
+                                pre_input =  op->getInputs(0);
                             } else {
                                 op->setTransB(true);
+                                pre_input =  op->getInputs(1);
                             }
+                            auto trans_input = prev_op->getInputs(0);
+                            trans_input->removeTarget(prev_op);
+                            trans_input->addTarget(op);
+                            op->replaceInput(pre_input,trans_input);
+
                         }
-                        auto trans_input = prev_op->getInputs(0);
-                        trans_input->removeTarget(op);
-                        trans_input->addTarget(op);
-                        op->replaceInput(op->getInputs(0),trans_input);
+
                         op->removePredecessors(prev_op);
                         removeOperator(prev_op);
                         removeTensor(prev_op_output);
@@ -238,7 +245,16 @@ namespace infini
         // TODO：利用 allocator 给计算图分配内存
         // HINT: 获取分配好的内存指针后，可以调用 tensor 的 setDataBlob 函数给 tensor 绑定内存
         // =================================== 作业 ===================================
-
+        auto n = tensors.size();
+        std::vector<size_t> offsets(n);
+        for (size_t i = 0;i<n;i++){
+            offsets[i] = allocator.alloc(tensors[i]->getBytes());
+        }
+        auto ptr = allocator.getPtr();
+        for(size_t i = 0; i<n;i++){
+            void* addr =(char*) ptr + offsets[i];
+            tensors[i] ->setDataBlob(make_ref<BlobObj>(runtime,addr));
+        }
         allocator.info();
     }
 

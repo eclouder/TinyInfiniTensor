@@ -15,8 +15,8 @@ Shape infer_broadcast(const Shape &A, const Shape &B) {
     Shape shape(rank,0);
     // 从后往前
     for(int i = 0;i<rank;++i){
-        auto d_a = rankA<i ? A[rankA-i-1]:1;
-        auto d_b = rankB<i ? B[rankB-i-1]:1;
+        auto d_a = rankA>i ? A[rankA-i-1]:1;
+        auto d_b = rankB>i ? B[rankB-i-1]:1;
         if (d_a == d_b || d_b == 1 || d_a == 1){
             shape[rank-i - 1]  = std::max(d_a,d_b);
         }

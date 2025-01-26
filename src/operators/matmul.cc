@@ -48,22 +48,21 @@ namespace infini
         auto shapeB = B->getDims();
         int rankA = A->getRank();
         int rankB = A->getRank();
-        int rank = std::max(rankA,rankB);
-        Shape shape(rank,0);
-        // 从后往前
-        for(int i = 0;i<rank;++i){
-            auto d_a = rankA>i ? shapeA[rankA-i-1]:1;
-            auto d_b = rankB>i ? shapeB[rankB-i-1]:1;
-            if (i == rank - 2){
-                shape[rankA-i-1] = shapeA[rankA-i-1];
+        int rank = std::max(rankA, rankB);
+        Shape shape(rank, 0);
+        for (int i = 0; i < rank; i++) {
+            int dimA = i < rankA ? shapeA[rankA - i - 1] : 1;
+            int dimB = i < rankB ? shapeB[rankB - i - 1] : 1;
+            if (i == 1) {
+                shape[rank - i - 1] = shapeA[rankA - 2];
                 continue;
             }
-            if (i == rank - 1){
-                shape[rankB-i-1] = shapeB[rankB-i-1];
-
+            if (i == 0) {
+                shape[rank - i - 1] = shapeB[rankB - 1];
+                continue;
             }
-            if (d_a == d_b || d_b == 1 || d_a == 1){
-                shape[rank-i - 1]  = std::max(d_a,d_b);
+            if ((dimA == dimB) || (dimA == 1) | (dimB == 1)) {
+                shape[rank - i - 1] = std::max(dimA, dimB);
             }
         }
         return vector<Shape>{shape};
